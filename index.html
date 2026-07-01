@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHT3D Short Course — Feedback Survey</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#1b2d52;--slate:#3a5a8c;--aqua:#3ab5c4;--aqua-light:#d8f3f6;
+  --green:#2ba87e;--bg:#f0f4fb;--card:#fff;--text:#1b2d52;
+  --muted:#6b7d9c;--border:#dde4f0;--red:#d95f5f;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+.survey-header{background:var(--navy);padding:30px 32px 22px;position:relative;overflow:hidden}
+.survey-header::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;border-radius:50%;background:rgba(58,181,196,0.10)}
+.survey-header::after{content:'';position:absolute;bottom:-70px;left:35%;width:300px;height:300px;border-radius:50%;background:rgba(58,181,196,0.06)}
+.header-tag{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.18em;color:var(--aqua);text-transform:uppercase;margin-bottom:8px}
+.survey-header h1{font-size:21px;font-weight:700;color:#fff;line-height:1.3;margin-bottom:4px}
+.survey-header p{font-size:13px;color:rgba(255,255,255,.55);font-weight:300}
+
+.progress-wrap{background:var(--navy);padding:0 32px 22px}
+.progress-meta{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.4);margin-bottom:8px;font-family:'JetBrains Mono',monospace}
+.progress-track{background:rgba(255,255,255,.12);border-radius:4px;height:5px;overflow:hidden}
+.progress-fill{background:linear-gradient(90deg,var(--aqua),var(--green));height:100%;border-radius:4px;transition:width .4s ease;width:0%}
+
+.survey-body{padding:24px 22px 40px;max-width:660px;margin:0 auto}
+.section-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--slate);margin:26px 0 12px;display:flex;align-items:center;gap:10px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.section-label:first-child{margin-top:4px}
+
+.q-card{background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;transition:border-color .2s}
+.q-card.error{border-color:var(--red)}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--aqua);font-weight:500;margin-bottom:5px;letter-spacing:.1em}
+.q-text{font-size:14px;font-weight:600;color:var(--navy);line-height:1.45;margin-bottom:3px}
+.q-hint{font-size:11.5px;color:var(--muted);margin-bottom:13px;font-style:italic}
+
+.options{display:flex;flex-direction:column;gap:7px}
+.opt-label{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:13px;color:var(--text);transition:all .15s;line-height:1.4}
+.opt-label:hover{border-color:var(--aqua);background:var(--aqua-light)}
+.opt-label input{display:none}
+.opt-label.selected{border-color:var(--aqua);background:var(--aqua-light);color:var(--navy);font-weight:500}
+
+.opt-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:1px;transition:all .15s;position:relative}
+.opt-label.selected .opt-dot{background:var(--aqua);border-color:var(--aqua)}
+.opt-dot::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:7px;height:7px;border-radius:50%;background:#fff;transition:transform .15s}
+.opt-label.selected .opt-dot::after{transform:translate(-50%,-50%) scale(1)}
+
+.opt-box{width:16px;height:16px;border-radius:4px;border:2px solid var(--border);flex-shrink:0;margin-top:1px;transition:all .15s;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+.opt-label.selected .opt-box{background:var(--aqua);border-color:var(--aqua)}
+.opt-label.selected .opt-box::after{content:'✓'}
+
+.text-input{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',system-ui,sans-serif;font-size:13px;color:var(--text);background:#fff;resize:vertical;min-height:72px;outline:none;transition:border-color .2s}
+.text-input:focus{border-color:var(--aqua)}
+
+.stars{display:flex;gap:5px}
+.star{font-size:32px;cursor:pointer;color:var(--border);transition:color .1s,transform .1s;line-height:1}
+.star.lit{color:#f5a623}
+.star:hover{transform:scale(1.12)}
+.star-label{font-size:12px;color:var(--muted);margin-top:7px;height:16px}
+
+.scale-wrap{display:flex;flex-direction:column;gap:8px}
+.scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.scale-btns{display:flex;gap:5px}
+.scale-btn{flex:1;height:38px;border:1.5px solid var(--border);border-radius:7px;background:#fff;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all .15s;font-family:'Inter',system-ui,sans-serif}
+.scale-btn:hover{border-color:var(--aqua);color:var(--aqua)}
+.scale-btn.active{background:var(--aqua);border-color:var(--aqua);color:#fff}
+
+.err-msg{font-size:11.5px;color:var(--red);margin-top:7px;display:none}
+
+.nav-wrap{display:flex;justify-content:space-between;align-items:center;margin-top:26px;gap:12px}
+.btn{padding:12px 24px;border-radius:9px;font-family:'Inter',system-ui,sans-serif;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.btn-back{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-back:hover{border-color:var(--slate);color:var(--slate)}
+.btn-next{background:var(--navy);color:#fff;margin-left:auto}
+.btn-next:hover{background:var(--slate)}
+.btn-submit{background:linear-gradient(135deg,var(--green),var(--aqua));color:#fff;margin-left:auto;padding:12px 30px}
+.btn-submit:hover{opacity:.9}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed}
+
+.thankyou{display:none;padding:48px 24px;text-align:center;max-width:460px;margin:0 auto}
+.ty-icon{font-size:54px;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="survey-header">
+  <div class="header-tag">PHT3D Short Course · Post-Course Evaluation</div>
+  <h1>Course Feedback Survey</h1>
+  <p>~5 minutes &nbsp;·&nbsp; All responses are anonymous</p>
+</div>
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span id="prog-label">Part 1 of 2</span>
+    <span id="prog-pct">0%</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="prog-bar"></div></div>
+</div>
+
+<div class="survey-body">
+
+  <!-- PAGE 1: Course experience -->
+  <div id="page-1">
+    <div class="section-label">Part A · Course experience</div>
+
+    <div class="q-card" id="qc-1">
+      <div class="q-num">Q1</div>
+      <div class="q-text">Overall, how would you rate this course?</div>
+      <div class="stars" id="stars-q1">
+        <span class="star" data-val="1">★</span>
+        <span class="star" data-val="2">★</span>
+        <span class="star" data-val="3">★</span>
+        <span class="star" data-val="4">★</span>
+        <span class="star" data-val="5">★</span>
+      </div>
+      <div class="star-label" id="star-label-q1">Click to rate</div>
+      <div class="err-msg" id="err-1">Please provide a rating.</div>
+    </div>
+
+    <div class="q-card" id="qc-2">
+      <div class="q-num">Q2</div>
+      <div class="q-text">To what extent did the course meet your goals?</div>
+      <div class="q-hint">1 = Not at all &nbsp;·&nbsp; 5 = Fully met</div>
+      <div class="scale-wrap">
+        <div class="scale-btns" id="scale-q2">
+          <button class="scale-btn" onclick="setScale('q2',1,this)">1</button>
+          <button class="scale-btn" onclick="setScale('q2',2,this)">2</button>
+          <button class="scale-btn" onclick="setScale('q2',3,this)">3</button>
+          <button class="scale-btn" onclick="setScale('q2',4,this)">4</button>
+          <button class="scale-btn" onclick="setScale('q2',5,this)">5</button>
+        </div>
+        <div class="scale-labels"><span>Not at all</span><span>Fully met</span></div>
+      </div>
+      <div class="err-msg" id="err-2">Please select a value.</div>
+    </div>
+
+    <div class="q-card" id="qc-3">
+      <div class="q-num">Q3</div>
+      <div class="q-text">How did you find the pacing of the course?</div>
+      <div class="q-hint">Select one</div>
+      <div class="options">
+        <label class="opt-label"><input type="radio" name="q3" value="too_slow"><div class="opt-dot"></div>Too slow — I wanted to move faster</label>
+        <label class="opt-label"><input type="radio" name="q3" value="about_right"><div class="opt-dot"></div>About right</label>
+        <label class="opt-label"><input type="radio" name="q3" value="slightly_fast"><div class="opt-dot"></div>Slightly fast, but manageable</label>
+        <label class="opt-label"><input type="radio" name="q3" value="too_fast"><div class="opt-dot"></div>Too fast — I struggled to keep up</label>
+      </div>
+      <div class="err-msg" id="err-3">Please select one option.</div>
+    </div>
+
+    <div class="q-card" id="qc-4">
+      <div class="q-num">Q4</div>
+      <div class="q-text">How would you rate the difficulty level of the content?</div>
+      <div class="q-hint">Select one</div>
+      <div class="options">
+        <label class="opt-label"><input type="radio" name="q4" value="too_easy"><div class="opt-dot"></div>Too basic for my level</label>
+        <label class="opt-label"><input type="radio" name="q4" value="just_right"><div class="opt-dot"></div>Just right</label>
+        <label class="opt-label"><input type="radio" name="q4" value="challenging"><div class="opt-dot"></div>Challenging but appropriate</label>
+        <label class="opt-label"><input type="radio" name="q4" value="too_hard"><div class="opt-dot"></div>Too advanced — I needed more background first</label>
+      </div>
+      <div class="err-msg" id="err-4">Please select one option.</div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Q5</div>
+      <div class="q-text">What was the most valuable part of the course for you?</div>
+      <textarea class="text-input" id="q5" placeholder="e.g. the hands-on exercises, a specific topic, the Q&A sessions…"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Q6</div>
+      <div class="q-text">What could be improved in future editions?</div>
+      <textarea class="text-input" id="q6" placeholder="Content, structure, materials, exercises, support…"></textarea>
+    </div>
+
+    <div class="nav-wrap">
+      <button class="btn btn-next" onclick="goTo(2)">Next: Looking Ahead →</button>
+    </div>
+  </div>
+
+  <!-- PAGE 2: Looking ahead -->
+  <div id="page-2" style="display:none">
+    <div class="section-label">Part B · Looking ahead</div>
+
+    <div class="q-card" id="qc-7">
+      <div class="q-num">Q7</div>
+      <div class="q-text">How confident do you feel applying PHT3D / PHREEQC to your own work after this course?</div>
+      <div class="q-hint">1 = Not at all confident &nbsp;·&nbsp; 5 = Very confident</div>
+      <div class="scale-wrap">
+        <div class="scale-btns" id="scale-q7">
+          <button class="scale-btn" onclick="setScale('q7',1,this)">1</button>
+          <button class="scale-btn" onclick="setScale('q7',2,this)">2</button>
+          <button class="scale-btn" onclick="setScale('q7',3,this)">3</button>
+          <button class="scale-btn" onclick="setScale('q7',4,this)">4</button>
+          <button class="scale-btn" onclick="setScale('q7',5,this)">5</button>
+        </div>
+        <div class="scale-labels"><span>Not confident</span><span>Very confident</span></div>
+      </div>
+      <div class="err-msg" id="err-7">Please select a value.</div>
+    </div>
+
+    <div class="q-card" id="qc-8">
+      <div class="q-num">Q8</div>
+      <div class="q-text">How likely are you to recommend this course to a colleague?</div>
+      <div class="q-hint">1 = Not likely &nbsp;·&nbsp; 10 = Extremely likely</div>
+      <div class="scale-wrap">
+        <div class="scale-btns" id="scale-q8" style="gap:4px">
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',1,this)">1</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',2,this)">2</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',3,this)">3</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',4,this)">4</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',5,this)">5</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',6,this)">6</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',7,this)">7</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',8,this)">8</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',9,this)">9</button>
+          <button class="scale-btn" style="font-size:12px" onclick="setScale('q8',10,this)">10</button>
+        </div>
+        <div class="scale-labels"><span>Not likely</span><span>Extremely likely</span></div>
+      </div>
+      <div class="err-msg" id="err-8">Please select a value.</div>
+    </div>
+
+    <div class="q-card" id="qc-9">
+      <div class="q-num">Q9</div>
+      <div class="q-text">What format would you prefer for a future PHT3D course?</div>
+      <div class="q-hint">Select all that apply</div>
+      <div class="options">
+        <label class="opt-label"><input type="checkbox" name="q9" value="inperson"><div class="opt-box"></div>In-person (intensive short course)</label>
+        <label class="opt-label"><input type="checkbox" name="q9" value="online_live"><div class="opt-box"></div>Online — live sessions</label>
+        <label class="opt-label"><input type="checkbox" name="q9" value="online_async"><div class="opt-box"></div>Online — self-paced / recorded</label>
+        <label class="opt-label"><input type="checkbox" name="q9" value="hybrid"><div class="opt-box"></div>Hybrid (online theory + in-person practical)</label>
+      </div>
+      <div class="err-msg" id="err-9">Please select at least one option.</div>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Q10</div>
+      <div class="q-text">What additional topics would you like to see in a follow-up course?</div>
+      <textarea class="text-input" id="q10" placeholder="e.g. PEST++ calibration, multi-component reactive transport, isotope systems, 3-D MODFLOW coupling…"></textarea>
+    </div>
+
+    <div class="q-card">
+      <div class="q-num">Q11</div>
+      <div class="q-text">Any other comments or suggestions for the instructors?</div>
+      <textarea class="text-input" id="q11" placeholder="All feedback is welcome and read carefully!"></textarea>
+    </div>
+
+    <div class="nav-wrap">
+      <button class="btn btn-back" onclick="goTo(1)">← Back</button>
+      <button class="btn btn-submit" id="submit-btn" onclick="submitSurvey()">Submit Feedback ✓</button>
+    </div>
+  </div>
+
+  <!-- Thank you -->
+  <div id="thankyou" class="thankyou">
+    <div class="ty-icon">🌊</div>
+    <div style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:10px">Thank you for your feedback!</div>
+    <p style="font-size:14px;color:var(--muted);line-height:1.65">Your responses help shape future PHT3D short courses. We appreciate you taking the time — and hope to see you in the next edition!</p>
+  </div>
+
+</div>
+
+<script>
+const scaleState = {};
+const starState  = {};
+let currentPage  = 1;
+const PAGE_COUNT = 2;
+
+// ── Paste your Apps Script Web App URL here ──────────────────
+var ENDPOINT = 'https://script.google.com/macros/s/AKfycbwzWtD1dMd0vlipsw1Du7Jt7wmV6NiH08ul9oRV4KNwDOtRFEVjQGlNDAaIEDIshAez9Q/exec';
+// ─────────────────────────────────────────────────────────────
+
+function updateProgress(page) {
+  const done = page > PAGE_COUNT;
+  const pct  = done ? 100 : Math.round(((page - 1) / PAGE_COUNT) * 100);
+  document.getElementById('prog-bar').style.width  = pct + '%';
+  document.getElementById('prog-pct').textContent  = pct + '%';
+  document.getElementById('prog-label').textContent = done ? 'Complete!' : 'Part ' + page + ' of ' + PAGE_COUNT;
+}
+
+function goTo(page) {
+  if (page > currentPage && !validatePage(currentPage)) return;
+  document.getElementById('page-' + currentPage).style.display = 'none';
+  currentPage = page;
+  document.getElementById('page-' + currentPage).style.display = 'block';
+  updateProgress(page);
+  window.scrollTo(0, 0);
+}
+
+// Radio / checkbox click
+document.addEventListener('click', function(e) {
+  const label = e.target.closest('.opt-label');
+  if (!label) return;
+  const input = label.querySelector('input');
+  if (!input) return;
+  if (input.type === 'radio') {
+    document.querySelectorAll('input[name="' + input.name + '"]').forEach(r => {
+      r.closest('.opt-label').classList.remove('selected');
+    });
+    input.checked = true;
+    label.classList.add('selected');
+  } else {
+    input.checked = !input.checked;
+    label.classList.toggle('selected', input.checked);
+  }
+  const card = label.closest('.q-card');
+  if (card) card.classList.remove('error');
+});
+
+// Stars
+document.querySelectorAll('.stars').forEach(starsEl => {
+  const qid    = starsEl.id.replace('stars-', '');
+  const stars  = starsEl.querySelectorAll('.star');
+  const lbl    = document.getElementById('star-label-' + qid);
+  const labels = ['', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
+  function render(val) {
+    stars.forEach((s, i) => s.classList.toggle('lit', i < val));
+    lbl.textContent = val ? labels[val] : 'Click to rate';
+  }
+  stars.forEach(star => {
+    star.addEventListener('mouseenter', () => render(+star.dataset.val));
+    star.addEventListener('mouseleave', () => render(starState[qid] || 0));
+    star.addEventListener('click', () => {
+      starState[qid] = +star.dataset.val;
+      render(starState[qid]);
+      document.getElementById('qc-' + qid.replace('q','')).classList.remove('error');
+      document.getElementById('err-' + qid.replace('q','')).style.display = 'none';
+    });
+  });
+});
+
+// Scale buttons
+function setScale(qid, val, btn) {
+  scaleState[qid] = val;
+  document.getElementById('scale-' + qid).querySelectorAll('.scale-btn')
+    .forEach((b, i) => b.classList.toggle('active', i < val));
+  const num = qid.replace('q', '');
+  const errEl = document.getElementById('err-' + num);
+  if (errEl) errEl.style.display = 'none';
+  const card = btn.closest('.q-card');
+  if (card) card.classList.remove('error');
+}
+
+// Validation
+function validatePage(page) {
+  let ok = true;
+  function checkRadio(name, errId, cardId) {
+    const sel  = document.querySelector('input[name="' + name + '"]:checked');
+    const err  = document.getElementById(errId);
+    const card = document.getElementById(cardId);
+    if (!sel) { err.style.display = 'block'; card.classList.add('error'); ok = false; }
+    else      { err.style.display = 'none';  card.classList.remove('error'); }
+  }
+  function checkScale(key, errId, cardId) {
+    const err  = document.getElementById(errId);
+    const card = document.getElementById(cardId);
+    if (!scaleState[key]) { err.style.display = 'block'; card.classList.add('error'); ok = false; }
+    else                  { err.style.display = 'none';  card.classList.remove('error'); }
+  }
+  if (page === 1) {
+    if (!starState['q1']) {
+      document.getElementById('err-1').style.display = 'block';
+      document.getElementById('qc-1').classList.add('error'); ok = false;
+    } else {
+      document.getElementById('err-1').style.display = 'none';
+      document.getElementById('qc-1').classList.remove('error');
+    }
+    checkScale('q2', 'err-2', 'qc-2');
+    checkRadio('q3', 'err-3', 'qc-3');
+    checkRadio('q4', 'err-4', 'qc-4');
+  }
+  if (page === 2) {
+    checkScale('q7', 'err-7', 'qc-7');
+    checkScale('q8', 'err-8', 'qc-8');
+    const cb   = document.querySelector('input[name="q9"]:checked');
+    const err9 = document.getElementById('err-9');
+    const c9   = document.getElementById('qc-9');
+    if (!cb) { err9.style.display = 'block'; c9.classList.add('error'); ok = false; }
+    else     { err9.style.display = 'none';  c9.classList.remove('error'); }
+  }
+  return ok;
+}
+
+// Collect all answers
+function collectResponses() {
+  function radio(name) {
+    const el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+  function checkboxes(name) {
+    return Array.from(document.querySelectorAll('input[name="' + name + '"]:checked'))
+      .map(el => el.closest('.opt-label').textContent.trim()).join(', ');
+  }
+  return {
+    q1:  starState['q1'] ? starState['q1'] + '★' : '',
+    q2:  scaleState['q2'] || '',
+    q3:  radio('q3'),
+    q4:  radio('q4'),
+    q5:  document.getElementById('q5').value.trim(),
+    q6:  document.getElementById('q6').value.trim(),
+    q7:  scaleState['q7'] || '',
+    q8:  scaleState['q8'] || '',
+    q9:  checkboxes('q9'),
+    q10: document.getElementById('q10').value.trim(),
+    q11: document.getElementById('q11').value.trim()
+  };
+}
+
+// Submit
+function submitSurvey() {
+  if (!validatePage(2)) return;
+  const btn = document.getElementById('submit-btn');
+  btn.textContent = 'Submitting…';
+  btn.disabled    = true;
+
+  fetch(ENDPOINT, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(collectResponses())
+  })
+  .then(() => {
+    document.getElementById('page-2').style.display = 'none';
+    document.getElementById('thankyou').style.display = 'block';
+    updateProgress(PAGE_COUNT + 1);
+    window.scrollTo(0, 0);
+  })
+  .catch(err => {
+    btn.textContent = 'Submit Feedback ✓';
+    btn.disabled    = false;
+    alert('Submission failed — please check your connection and try again.\n\n(' + err + ')');
+  });
+}
+
+updateProgress(1);
+</script>
+</body>
+</html>
